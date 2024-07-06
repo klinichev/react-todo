@@ -15,29 +15,90 @@ const Li = styled.li`
   & input {
     margin-right: 10px;
   }
+
+  & input:checked + div {
+    text-decoration: line-through;
+  }
 `;
 
 const Form = styled.form`
-  font-size: 20px;
-  line-height: 30px;
-
   & input {
-    min-width: 300px;
-    padding: 6px;
+    min-width: 450px;
+    padding: 10px;
     border-radius: 6px;
     border: 1px solid #aaa;
-    margin-right: 10px;
+    margin-right: 20px;
+    font-size: 20px;
+    line-height: 30px;
   }
+`;
 
-  & button {
-    min-width: 100px;
-    padding: 6px;
-    border-radius: 6px;
-    border: none;
-    background-color: #22a;
-    color: #fff;
-    cursor: pointer;
+const Button = styled.button`
+  min-width: 100px;
+  padding: 10px 20px;
+  border-radius: 6px;
+  border: none;
+  background-color: #22a;
+  color: #fff;
+  font-size: 20px;
+  line-height: 30px;
+  cursor: pointer;
+  transition: all 200ms ease-in-out;
+
+  &:hover {
+    background-color: #008;
   }
+`;
+
+const CloseButton = styled.button`
+  position: absolute;
+  top: 25px;
+  right: 25px;  
+  width: 40px;
+  height: 40px;
+  padding: 10px 0;
+  border-radius: 6px;
+  border: none;
+  background-color: #aaa;
+  color: #000;
+  font-size: 20px;
+  line-height: 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 200ms ease-in-out;
+
+  &:hover {
+    background-color: #999;
+  }
+`;
+
+const DialogWrapper = styled.div`
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  background-color: rgba(0, 0, 0, 0.3);
+  z-index: 2;
+  cursor: pointer;
+`;
+
+const DialogModal = styled.div`
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-50%);
+  padding: 25px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 700px;
+  height: 250px;
+  z-index: 3;
+  background-color: #99d;
+  border-radius: 12px;
+  box-shadow: 0 8px 16px rgb(38 44 64 / 10%);
+  cursor: auto;
 `;
 
 function saveItemIntoStorage(key, value) {
@@ -101,8 +162,37 @@ export default function App() {
         <List tasks={tasksArray} onChangeIsDone={onCheckboxValueChanged} />
       </div>
       <div>
-        <AddForm onSubmit={onTaskAdded} />
+        <Dialog onSubmitDialog={onTaskAdded} />
       </div>
+    </div>
+  );
+}
+
+function Dialog({ onSubmitDialog }) {
+  const [isVisible, setVisible] = useState(false);
+
+  const handleOpen = () => {
+    setVisible(true);
+  };
+
+  const handleClose = () => {
+    setVisible(false);
+  };
+
+  const onSubmitForm = (value) => {
+    handleClose();
+    onSubmitDialog(value);
+  };
+
+  return (
+    <div>
+      <Button onClick={handleOpen}>Добавить дело</Button>
+      <DialogWrapper onClick={handleClose} style={{display: isVisible ? 'block' : 'none'}}>
+        <DialogModal onClick={(e) => e.stopPropagation()}>
+          <CloseButton onClick={handleClose}>x</CloseButton>
+          <AddForm onSubmit={onSubmitForm} />
+        </DialogModal>
+      </DialogWrapper>
     </div>
   );
 }
@@ -121,7 +211,7 @@ function AddForm({ onSubmit }) {
   return (
     <Form onSubmit={handleSubmit}>
       <input type='text' placeholder='Введите название нового дела' value={value} onChange={(e) => setValue(e.target.value)} />
-      <button type='submit'>Добавить</button>
+      <Button type='submit'>Добавить</Button>
     </Form>
   );
 }
