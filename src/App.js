@@ -58,8 +58,8 @@ const CloseButton = styled.button`
   height: 40px;
   padding: 10px 0;
   border-radius: 6px;
-  border: none;
-  background-color: #aaa;
+  border: 1px solid #000;
+  background-color: #eee;
   color: #000;
   font-size: 20px;
   line-height: 20px;
@@ -68,7 +68,23 @@ const CloseButton = styled.button`
   transition: all 200ms ease-in-out;
 
   &:hover {
-    background-color: #999;
+    background-color: #ddd;
+  }
+
+  &::before, 
+  &::after {
+    position: absolute;
+    content: '';
+    width: 15px;
+    height: 2px;
+    left: 12px;
+    top: 18px;
+    background-color: #000;
+    transform: rotate(45deg) scaleY(.6);
+  }
+
+  &::after {
+    transform: rotate(-45deg) scaleY(.6);
   }
 `;
 
@@ -95,7 +111,7 @@ const DialogModal = styled.div`
   width: 700px;
   height: 250px;
   z-index: 3;
-  background-color: #99d;
+  background-color: #eee;
   border-radius: 12px;
   box-shadow: 0 8px 16px rgb(38 44 64 / 10%);
   cursor: auto;
@@ -189,7 +205,7 @@ function Dialog({ onSubmitDialog }) {
       <Button onClick={handleOpen}>Добавить дело</Button>
       <DialogWrapper onClick={handleClose} style={{display: isVisible ? 'block' : 'none'}}>
         <DialogModal onClick={(e) => e.stopPropagation()}>
-          <CloseButton onClick={handleClose}>x</CloseButton>
+          <CloseButton onClick={handleClose}></CloseButton>
           <AddForm onSubmit={onSubmitForm} />
         </DialogModal>
       </DialogWrapper>
