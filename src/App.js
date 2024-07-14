@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { QueryClient, QueryClientProvider, useMutation, useQuery, useQueryClient } from 'react-query';
 import styled from 'styled-components';
 
 const Ul = styled.ul`
@@ -117,28 +118,30 @@ const DialogModal = styled.div`
   cursor: auto;
 `;
 
-function saveItemIntoStorage(key, value) {
+async function saveItemIntoStorage(key, value) {
   try {
-    console.log(value);
-    return window.localStorage.setItem(key, value);
-  } catch (e) {
+    console.log(JSON.stringify(value));
+    let response = await window.localStorage.setItem(key, JSON.stringify(value));
+    return response;
+  } catch(e) {
     console.log(e);
   }
 }
 
-function getItemFromStorage(key) {
-  // return JSON.stringify([{
-  //   'value': 'Delo 1',
-  //   'isDone': false,
-  //   'key': 0
-  // }, {
-  //   'value': 'Delo 2',
-  //   'isDone': false,
-  //   'key': 1
-  // }]);
+async function getItemFromStorage(key) {
   try {
-    return window.localStorage.getItem(key);
-  } catch (e) {
+    // return [{
+    //   'value': 'Delo 1',
+    //   'isDone': false,
+    //   'key': 0
+    // }, {
+    //   'value': 'Delo 2',
+    //   'isDone': false,
+    //   'key': 1
+    // }]; 
+    let response = await JSON.parse(window.localStorage.getItem(key));
+    return response;
+  } catch(e) {
     console.log(e);
   }
 }
@@ -146,36 +149,55 @@ function getItemFromStorage(key) {
 // components
 
 export default function App() {
-  const [tasksArray, setTasksArray] = useState(JSON.parse(getItemFromStorage('tasks')));
+  const queryClient = new QueryClient();
+
+  return (
+    <QueryClientProvider client={queryClient}>
+      <Todo />
+    </QueryClientProvider>
+  );  
+}
+
+function Todo() {
+  const queryClient = useQueryClient();
+  const {isLoading, isError, data, error} = useQuery('tasks', () => getItemFromStorage('tasks').then((response) => response));
+
+  const mutation = useMutation((newArray) => saveItemIntoStorage('tasks', newArray), {
+    onSuccess: () => {
+      queryClient.invalidateQueries('tasks');
+    },
+  });
 
   const onCheckboxValueChanged = (key, newValue) => {
     console.log(key);
     console.log(newValue);
-    const arrayToChange = tasksArray.map((item) => {
+    const arrayToChange = data.map((item) => {
         if (item.key === key) {
             return {...item, isDone: newValue};
         }
         return item;
     });
-    setTasksArray(arrayToChange);
-    saveItemIntoStorage('tasks', JSON.stringify(arrayToChange));
+    mutation.mutate(arrayToChange);
   };
 
   const onTaskAdded = (value) => {
-    let newKey = tasksArray[tasksArray.length - 1].key + 1;
-    const arrayToChange = [...tasksArray, {
+    let newKey = data[data.length - 1].key + 1;
+    const arrayToChange = [...data, {
       'value': value, 
       'isDone': false,
       'key': newKey
     }];
-    setTasksArray(arrayToChange);
-    saveItemIntoStorage('tasks', JSON.stringify(arrayToChange));
-  }
+    mutation.mutate(arrayToChange);
+  };
+
+  if (isLoading) return <p>Загрузка...</p>;
+
+  if (isError) return <p>Ошибка: {error.message}</p>;
 
   return (
     <div>
       <div>
-        <List tasks={tasksArray} onChangeIsDone={onCheckboxValueChanged} />
+        <List tasks={data} onChangeIsDone={onCheckboxValueChanged} />
       </div>
       <div>
         <Dialog onSubmitDialog={onTaskAdded} />
