@@ -1,9 +1,9 @@
-import { QueryClient, QueryClientProvider, useMutation, useQuery, useQueryClient } from 'react-query';
+import { QueryClient, QueryClientProvider, useQueryClient } from 'react-query';
 
-import * as api from './api/Queries.js';
-
-import CheckList from './components/CheckList.js';
-import Dialog from './components/Dialog.js';
+import CheckList from './components/check-list/CheckList.js';
+import Dialog from './components/dialog/Dialog.js';
+import SimpleForm from './components/simple-form/SimpleForm.js';
+import * as mutations from './api/Mutations.js';
 
 export default function App() {
   const queryClient = new QueryClient();
@@ -12,40 +12,21 @@ export default function App() {
     <QueryClientProvider client={queryClient}>
       <Todo />
     </QueryClientProvider>
-  );  
+  );
 }
 
 function Todo() {
   const queryClient = useQueryClient();
-  const {isLoading, isError, data, error} = useQuery('tasks', () => api.getItemFromStorage('tasks').then((response) => response));
 
-  const mutation = useMutation((newArray) => api.saveItemIntoStorage('tasks', newArray), {
-    onSuccess: () => {
+  const { isLoading, isError, data, error } = mutations.useTasks();
+  const { checkTask } = mutations.useCheckTask();
+
+  const onCheckBoxValueChanged = (params) => {
+    checkTask(params, () => {
+      console.log('checked');
       queryClient.invalidateQueries('tasks');
-    },
-  });
-
-  const onCheckboxValueChanged = (key, newValue) => {
-    console.log(key);
-    console.log(newValue);
-    const arrayToChange = data.map((item) => {
-        if (item.key === key) {
-            return {...item, isDone: newValue};
-        }
-        return item;
     });
-    mutation.mutate(arrayToChange);
-  };
-
-  const onTaskAdded = (value) => {
-    let newKey = data[data.length - 1].key + 1;
-    const arrayToChange = [...data, {
-      'value': value, 
-      'isDone': false,
-      'key': newKey
-    }];
-    mutation.mutate(arrayToChange);
-  };
+  }
 
   if (isLoading) return <p>Загрузка...</p>;
 
@@ -54,10 +35,10 @@ function Todo() {
   return (
     <div>
       <div>
-        <CheckList tasks={data} onChangeIsDone={onCheckboxValueChanged} />
+        <CheckList items={data} onChangeIsChecked={onCheckBoxValueChanged} isCheckedKeyName={'isDone'} />
       </div>
       <div>
-        <Dialog onSubmitDialog={onTaskAdded} />
+        <Dialog Content={SimpleForm} />
       </div>
     </div>
   );

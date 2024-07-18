@@ -1,9 +1,6 @@
-import { useState } from 'react';
 import styled from 'styled-components';
 
-import SimpleForm from './SimpleForm.js';
-
-const Button = styled.button`
+export const Button = styled.button`
   min-width: 100px;
   padding: 10px 20px;
   border-radius: 6px;
@@ -20,7 +17,7 @@ const Button = styled.button`
   }
 `;
 
-const CloseButton = styled.button`
+export const CloseButton = styled.button`
   position: absolute;
   top: 25px;
   right: 25px;  
@@ -58,7 +55,7 @@ const CloseButton = styled.button`
   }
 `;
 
-const DialogWrapper = styled.div`
+export const DialogWrapper = styled.div`
   position: fixed;
   width: 100%;
   height: 100%;
@@ -69,7 +66,7 @@ const DialogWrapper = styled.div`
   cursor: pointer;
 `;
 
-const DialogModal = styled.div`
+export const DialogModal = styled.div`
   position: absolute;
   top: 50%;
   left: 50%;
@@ -86,32 +83,3 @@ const DialogModal = styled.div`
   box-shadow: 0 8px 16px rgb(38 44 64 / 10%);
   cursor: auto;
 `;
-
-export default function Dialog({ onSubmitDialog }) {
-    const [isVisible, setVisible] = useState(false);
-
-    const handleOpen = () => {
-        setVisible(true);
-    };
-
-    const handleClose = () => {
-        setVisible(false);
-    };
-
-    const onSubmitForm = (value) => {
-        handleClose();
-        onSubmitDialog(value);
-    };
-
-    return (
-        <div>
-            <Button onClick={handleOpen}>Добавить дело</Button>
-            <DialogWrapper onClick={handleClose} style={{ display: isVisible ? 'block' : 'none' }}>
-                <DialogModal onClick={(e) => e.stopPropagation()}>
-                    <CloseButton onClick={handleClose}></CloseButton>
-                    <SimpleForm onSubmit={onSubmitForm} />
-                </DialogModal>
-            </DialogWrapper>
-        </div>
-    );
-}
