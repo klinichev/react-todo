@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Button, Form } from './styles.js';
 
-import * as mutations from '../../api/Mutations.js';
+import * as mutations from '../../api/Tasks.js';
 import { useQueryClient } from 'react-query';
 
 const useFocus = () => {
