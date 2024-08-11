@@ -1,5 +1,6 @@
+import React from 'react';
 import { useState } from 'react';
-import { Button, CloseButton, DialogModal, DialogWrapper } from './styles.js';
+import { Button, CloseButton, DialogModal, DialogWrapper } from './styles.tsx';
 
 export default function Dialog({ Content }) {
     const [isVisible, setVisible] = useState(false);

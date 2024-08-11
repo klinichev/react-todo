@@ -1,8 +1,8 @@
-function timeout(ms) {
+function timeout(ms: number) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-export async function saveItemIntoStorage(key, value) {
+export async function saveItemIntoStorage(key: string, value: any) {
     try {
         console.log(JSON.stringify(value));
         let response = window.localStorage.setItem(key, JSON.stringify(value));
@@ -13,7 +13,7 @@ export async function saveItemIntoStorage(key, value) {
     }
 }
 
-export async function getItemFromStorage(key) {
+export async function getItemFromStorage(key: string) {
     try {
         // return [{
         //   'value': 'Delo 1',
@@ -24,8 +24,8 @@ export async function getItemFromStorage(key) {
         //   'isDone': false,
         //   'key': 1
         // }];
-        let response = await JSON.parse(window.localStorage.getItem(key));
-        return response;
+        let response = await window.localStorage.getItem(key) || '{}';
+        return JSON.parse(response);
     } catch (e) {
         console.log(e);
     }

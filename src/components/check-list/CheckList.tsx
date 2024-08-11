@@ -1,26 +1,42 @@
+import React from 'react';
 import { useQueryClient } from 'react-query';
 
-import * as mutations from '../../api/Tasks.js';
+import * as mutations from '../../api/Tasks.ts';
 
-import { Ul, Li } from './styles.js';
+import { Ul, Li } from './styles.tsx';
 
-export default function CheckList({ items }) {
+type Item = {
+    value: string;
+    isDone: boolean;
+    key: number;
+}
+
+interface checkListProps {
+    items: Item[];
+}
+
+interface changeParams {
+    key: number;
+    newValue: boolean;
+}
+
+export default function CheckList({ items }: checkListProps) {
     const queryClient = useQueryClient();
 
     const { checkTask } = mutations.useCheckTask();
 
-    const onChangeIsChecked = (params) => {
+    const onChangeIsChecked = (params: changeParams) => {
         checkTask(params, () => {
             console.log('checked');
             queryClient.invalidateQueries('tasks');
         });
     }
 
-    const itemsList = items.map((item, index) => {
+    const itemsList = items.map((item) => {
         const key = item.key;
         return (
             <CheckItem value={item.value} isChecked={item.isDone} key={key} 
-                        onChange={(newValue) => onChangeIsChecked({ key, newValue })} />
+                        onChange={(newValue: boolean) => onChangeIsChecked({ key, newValue })} />
         );
     });
 

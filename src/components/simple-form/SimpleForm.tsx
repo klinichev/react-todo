@@ -1,20 +1,26 @@
+import React, { FormEvent } from 'react';
 import { useEffect, useRef, useState } from 'react';
-import { Button, Form } from './styles.js';
+import { Button, Form } from './styles.tsx';
 
-import * as mutations from '../../api/Tasks.js';
+import * as mutations from '../../api/Tasks.ts';
 import { useQueryClient } from 'react-query';
 
 const useFocus = () => {
-    const htmlElRef = useRef(null);
+    const htmlElRef = useRef<HTMLInputElement>(null);
 
     const setFocus = () => {
         htmlElRef.current && htmlElRef.current.focus();
     }
 
-    return [htmlElRef, setFocus];
+    return [htmlElRef, setFocus] as const;
 }
 
-export default function SimpleForm({ isActive, setActive }) {
+interface simpleFormProps {
+    isActive: boolean;
+    setActive: (arg0: boolean) => void;
+}
+
+export default function SimpleForm({ isActive, setActive }: simpleFormProps) {
     const queryClient = useQueryClient();
 
     const [value, setValue] = useState('');
@@ -25,7 +31,7 @@ export default function SimpleForm({ isActive, setActive }) {
         if (isActive) setInputFocus();
     }, [isActive]);
 
-    const handleSubmit = (e) => {
+    const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         if (value !== '') {
             addNewTask(value, () => {

@@ -1,9 +1,10 @@
+import React from 'react';
 import { QueryClient, QueryClientProvider } from 'react-query';
 
-import CheckList from './components/check-list/CheckList.js';
-import Dialog from './components/dialog/Dialog.js';
-import SimpleForm from './components/simple-form/SimpleForm.js';
-import * as mutations from './api/Tasks.js';
+import CheckList from './components/check-list/CheckList.tsx';
+import Dialog from './components/dialog/Dialog.tsx';
+import SimpleForm from './components/simple-form/SimpleForm.tsx';
+import * as mutations from './api/Tasks.ts';
 
 export default function App() {
   const queryClient = new QueryClient();
@@ -20,7 +21,7 @@ function AppLoader() {
 
   if (isLoading) return <p>Загрузка...</p>;
 
-  if (isError) return <p>Ошибка: {error.message}</p>;
+  if (isError) return (error instanceof Error) ? <p>Ошибка: {error.message}</p> : <p>Ошибка!</p>;
 
   return (
     <Todo data={data} />
